@@ -5,9 +5,9 @@
     <parent>
         <groupId>com.emergya.mtsp</groupId>
         <version>0.1</version>
-        <artifactId>mtsp-ga</artifactId>
+        <artifactId>smartcity-mtsp</artifactId>
     </parent>
-    <artifactId>mtsp-ga-engine</artifactId>
+    <artifactId>mtsp-jsprit-engine</artifactId>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -4,9 +4,9 @@
     <parent>
         <groupId>com.emergya.mtsp</groupId>
         <version>0.1</version>
-        <artifactId>mtsp-ga</artifactId>
+        <artifactId>smartcity-mtsp</artifactId>
     </parent>
-    <artifactId>mtsp-ga-webapp</artifactId>
+    <artifactId>mtsp-jsprit-webapp</artifactId>
 	
     <packaging>war</packaging>
 
@@ -66,13 +66,13 @@
         
         <dependency>
             <groupId>com.emergya.mtsp</groupId>
-            <artifactId>mtsp-ga-engine</artifactId>
+            <artifactId>mtsp-jsprit-engine</artifactId>
             <version>0.1</version>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>mtsp-ga-webapp</finalName>
+        <finalName>smartcity-mtsp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
