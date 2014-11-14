@@ -117,7 +117,7 @@ public class MTSPGeneticsHandler {
 
                 if (gh == null) {
                     gh = new GraphHopperWeb();
-                    gh.load("http://geoemerg-win2008.emergya.es:8989/route");
+                    gh.load("http://localhost:8989/route");
                 }
 
                 Stop startStop = distanceStops.get(stopIdx);

@@ -17,18 +17,21 @@
  */
 package com.emergya.mtsp.webapp.controller;
 
-import com.emergya.mtsp.ga.MTSPGeneticsHandler;
-import com.emergya.mtsp.ga.MTSPRoutes;
-import com.emergya.mtsp.model.Vehicle;
-import com.emergya.mtsp.webapp.dto.MTSPRequest;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.emergya.mtsp.ga.MTSPRoutes;
+import com.emergya.mtsp.jsprit.MTSPJspritHandler;
+import com.emergya.mtsp.model.Stop;
+import com.emergya.mtsp.model.Vehicle;
+import com.emergya.mtsp.webapp.dto.MTSPRequest;
 
 /**
  *
@@ -39,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WSController {
     
     @Autowired
-    MTSPGeneticsHandler mtspHandler;
+    MTSPJspritHandler mtspHandler;
     
     @ResponseBody    
     @RequestMapping(method = RequestMethod.GET)    
@@ -52,9 +55,11 @@ public class WSController {
     @RequestMapping(value = "calculateMTSP", method = RequestMethod.POST)
     public MTSPRoutes calculateMTSP(@RequestBody MTSPRequest request) {
         List<Vehicle> vehicles =new ArrayList<>();
-        vehicles.add(new Vehicle("Vehicle 1", 1));
-        vehicles.add(new Vehicle("Vehicle 2", 1));
-        return mtspHandler.calculateMTSP(request.getOrigin(), request.getStops(), vehicles);
+        List<Stop> origins = request.getOrigins();
+        for(int i=0; i<origins.size(); i++){
+        	vehicles.add(new Vehicle("Vehicle " + i, i));
+        }
+        return mtspHandler.calculateMTSP(request.getOrigins(), request.getStops(), vehicles);
     }
     
 }

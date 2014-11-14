@@ -5,7 +5,8 @@
  */
 
 var mtsp = {
-    stopList: [],
+    originList: [],
+    targetList: [],
     map: null,
     routesGroup: null,
     initMap: function () {
@@ -16,32 +17,72 @@ var mtsp = {
         mtsp.routesGroup.addTo(map);
 
 
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 18
+        L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
+        	minZoom: 0,
+        	maxZoom: 18,
+        	attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
         }).addTo(map);
-
-        map.on("click", function (e) {
-            mtsp.stopList.push({
-                name: "Stop",
-                latitude: e.latlng.lat,
-                longitude: e.latlng.lng
-            });
-
-            L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-
-            $("#stopList").append("<li>" + e.latlng.lat + ", " + e.latlng.lng + "</li>");
-        });
-
+        
+        L.easyButton('fa-map-marker green', mtsp.activateOrigins,'Origins routes', map);
+        L.easyButton('fa-map-marker red', mtsp.activateTargets,'Targets routes', map);
+        L.easyButton('fa-play-circle', mtsp.calculateRoutes,'', map);
+        
         mtsp.map = map;
 
     },
+    
+    activateOrigins: function(e){
+    	mtsp.map.off("click", mtsp.onClickTargets);
+    	mtsp.map.on("click", mtsp.onClickOrigins);
+    },
+    
+    activateTargets: function(e){
+    	mtsp.map.off("click", mtsp.onClickOrigins);
+    	mtsp.map.on("click", mtsp.onClickTargets);
+    },
+    
+    onClickOrigins: function(e){
+    	mtsp.originList.push({
+            name: "Stop",
+            latitude: e.latlng.lat,
+            longitude: e.latlng.lng
+        });
+    	
+    	var icon = L.icon({
+    		iconUrl:'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|00FF00',
+    		iconSize: [21, 34],
+    		iconAnchor: [10, 40]
+    	});
+
+        L.marker([e.latlng.lat, e.latlng.lng], {icon: icon}).addTo(mtsp.map);
+
+        $("#stopList").append("<li>" + e.latlng.lat + ", " + e.latlng.lng + "</li>");
+    },
+    
+    onClickTargets: function(e){
+    	mtsp.targetList.push({
+            name: "Stop",
+            latitude: e.latlng.lat,
+            longitude: e.latlng.lng
+        });
+    	
+    	var icon = L.icon({
+    		iconUrl:'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000',
+    		iconSize: [21, 34],
+    		iconAnchor: [10, 40]
+    	});
+
+        L.marker([e.latlng.lat, e.latlng.lng], {icon: icon}).addTo(mtsp.map);
+
+        $("#stopList").append("<li>" + e.latlng.lat + ", " + e.latlng.lng + "</li>");
+    },
+    
     calculateRoutes: function () {
         mtsp.routesGroup.clearLayers();
         $.ajax({
             method: "POST",
             url: "v1/calculateMTSP",
-            data: JSON.stringify({origin: mtsp.stopList[0], stops: mtsp.stopList.slice(1)}),
+            data: JSON.stringify({origins: mtsp.originList, stops: mtsp.targetList}),
             success: function (data) {
                 console.debug(data);
 
@@ -50,7 +91,7 @@ var mtsp = {
                 for (var i = 0; i < data.routes.length; i++) {
                     L.geoJson(data.routes[i].feature,{
                         style: function() {
-                            return {color: colors[i]}
+                            return {color: colors[i]};
                         }
                     }).addTo(mtsp.routesGroup);
                 }

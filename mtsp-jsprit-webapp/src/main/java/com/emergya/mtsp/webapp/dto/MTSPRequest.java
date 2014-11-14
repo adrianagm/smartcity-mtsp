@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MTSPRequest implements Serializable {
 
-    private Stop origin;
+    private List<Stop> origins;
     
     private List<Stop> stops;
 
@@ -31,14 +31,14 @@ public class MTSPRequest implements Serializable {
     /**
      * @return the origin
      */
-    public Stop getOrigin() {
-        return origin;
+    public List<Stop> getOrigins() {
+        return origins;
     }
 
     /**
      * @param origin the origin to set
      */
-    public void setOrigin(Stop origin) {
-        this.origin = origin;
+    public void setOrigins(List<Stop> origins) {
+        this.origins = origins;
     }
 }
