@@ -24,7 +24,7 @@ public class MTSPRoute implements Serializable {
     private final Vehicle vehicle;
     private final List<Stop> stops;
 
-    private final LineString geometry;
+    private LineString geometry;
 
     public MTSPRoute(Vehicle vehicle) {
         this.vehicle = vehicle;
@@ -53,8 +53,18 @@ public class MTSPRoute implements Serializable {
     public List<Stop> getStops() {
         return stops;
     }
+    
+    
 
-    void createGeometry(GHResponse[][] distances) {
+    public LineString getGeometry() {
+		return geometry;
+	}
+
+	public void setGeometry(LineString geometry) {
+		this.geometry = geometry;
+	}
+
+	void createGeometry(GHResponse[][] distances) {
         addGeometry(distances.length-1, stops.get(0).getIndex(), distances);
         for (int i = 1; i < stops.size(); i++) {
             addGeometry(stops.get(i-1).getIndex(), stops.get(i).getIndex(), distances);

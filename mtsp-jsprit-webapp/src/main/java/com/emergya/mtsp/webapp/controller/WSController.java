@@ -54,7 +54,7 @@ public class WSController {
     @ResponseBody
     @RequestMapping(value = "calculateMTSP", method = RequestMethod.POST)
     public MTSPRoutes calculateMTSP(@RequestBody MTSPRequest request) {
-        List<Vehicle> vehicles =new ArrayList<>();
+        List<Vehicle> vehicles =new ArrayList<Vehicle>();
         List<Stop> origins = request.getOrigins();
         for(int i=0; i<origins.size(); i++){
         	vehicles.add(new Vehicle("Vehicle " + i, i));
