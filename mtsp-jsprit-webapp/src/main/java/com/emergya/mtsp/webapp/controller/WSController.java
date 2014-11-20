@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.emergya.mtsp.ga.MTSPRoutes;
 import com.emergya.mtsp.jsprit.MTSPJspritHandler;
 import com.emergya.mtsp.model.Stop;
 import com.emergya.mtsp.model.Vehicle;
+import com.emergya.mtsp.response.MTSPRoutes;
 import com.emergya.mtsp.webapp.dto.MTSPRequest;
 
 /**

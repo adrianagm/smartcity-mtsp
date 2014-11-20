@@ -33,10 +33,11 @@ import org.geojson.LngLatAlt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.emergya.mtsp.ga.MTSPRoute;
-import com.emergya.mtsp.ga.MTSPRoutes;
 import com.emergya.mtsp.model.Stop;
 import com.emergya.mtsp.model.Vehicle;
+import com.emergya.mtsp.response.MTSPRoute;
+import com.emergya.mtsp.response.MTSPRoutes;
+import com.emergya.mtsp.util.MTSPUtil;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -82,6 +83,9 @@ public class MTSPJspritHandler {
 			vrpBuilder.addJob(service);
 		}
 		
+//		MTSPRoutingCosts mtspcosts = new MTSPRoutingCosts(hopper);
+//		vrpBuilder.setRoutingCost(mtspcosts);
+		
 		vrpBuilder.setFleetSize(FleetSize.FINITE);
 		VehicleRoutingProblem problem = vrpBuilder.build();
 		
@@ -89,47 +93,53 @@ public class MTSPJspritHandler {
 		 * solve the problem
 		 */
 		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, "com/emergya/mtsp/resource/algorithmConfig.xml");
+		
 		vra.getAlgorithmListeners().addListener(new StopWatch(), Priority.HIGH);
 		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 		
 		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
+		
 		List<VehicleRoute> routes = (List<VehicleRoute>) bestSolution.getRoutes();
+		GHPoint endPoint = null;
 		for(VehicleRoute r:routes){
 			MTSPRoute route = new MTSPRoute(new Vehicle(r.getVehicle().getId(), 0.0));
 			TourActivities activities = r.getTourActivities();
 			Iterator<TourActivity> it = activities.iterator();
 			List<GHPoint> points = new LinkedList<GHPoint>();
 			// Start point
-			Double[] startCoordinate = getCoordinates(r.getStart().getLocationId());
-			GHPoint startPoint = new GHPoint(startCoordinate[1], startCoordinate[0]);
+			GHPoint startPoint = MTSPUtil.getCoordinatesFromString(r.getStart().getLocationId());
 			points.add(startPoint);
 			// End point
-			Double[] endCoordinate = getCoordinates(r.getEnd().getLocationId());
-			GHPoint endPoint = new GHPoint(endCoordinate[1], endCoordinate[0]);
-			points.add(endPoint);
+			endPoint = MTSPUtil.getCoordinatesFromString(r.getEnd().getLocationId());
+			//points.add(endPoint);
 			// Intermediate points
 			while(it.hasNext()){
 				// Get the coordinates string
 				TourActivity ta = it.next();
 				String index = ta.getLocationId();
 				// Get Coordinates point
-				Double[] coord = getCoordinates(index);
-				GHPoint point = new GHPoint(coord[1], coord[0]);
+				GHPoint point = MTSPUtil.getCoordinatesFromString(index);
 				points.add(point);
 			}
 			
 			GHRequest request = new GHRequest(points).setVehicle(this.VEHICLE).setWeighting(this.WEIGHTING);
 			GHResponse response = hopper.route(request);
 			PointList result_points = response.getPoints();
+			
+			GHRequest last_request = new GHRequest(points.get(points.size()-1).getLat(), points.get(points.size()-1).getLon(), endPoint.getLat(), endPoint.getLon());
+			GHResponse last_response = hopper.route(last_request);
+			PointList last_result_points = last_response.getPoints();
 			// Get geometry linestring
 			LineString geom = getRoute(result_points);
+			LineString last_geom = getRoute(last_result_points);
+			for(LngLatAlt el:last_geom.getCoordinates()){
+				geom.add(el);
+			}
 			route.setGeometry(geom);
 			res.getRoutes().add(route);
 		}
 		
-		SolutionPrinter.print(problem,bestSolution,Print.VERBOSE);
-		
-		//new GraphStreamViewer(problem, bestSolution).labelWith(Label.ID).setRenderDelay(200).display();
+		//SolutionPrinter.print(problem,bestSolution,Print.VERBOSE);
 		
 		return res;
 	}
@@ -142,37 +152,6 @@ public class MTSPJspritHandler {
 			route.add(new LngLatAlt(longitude, latitude));
 		}
 		return route;
-	}
-
-	private Double[] getCoordinates(String coordinate) {
-		// [x=-22.2][y=33.3]
-		Double[] d = new Double[2];
-		String[] splitted = null;
-		
-		while(coordinate.indexOf("[") > -1){
-			coordinate = coordinate.replace("[", "");
-		}
-		
-		while(coordinate.indexOf("]") > -1){
-			if(coordinate.indexOf("]") < coordinate.length()-1){
-				coordinate = coordinate.replace("]", ",");
-			}
-		}
-		
-		if(coordinate.indexOf(",") > -1){
-			splitted = coordinate.split(",");
-		}
-		Map<String, String> coord_kv = new HashMap<String, String>();
-		for(int i=0; i<splitted.length; i++){
-			if(splitted[i].indexOf("=") > -1){
-				coord_kv.put(splitted[i].split("=")[0], splitted[i].split("=")[1]);
-			}
-		}
-		
-		d[0] = Double.parseDouble(coord_kv.get("x"));
-		d[1] = Double.parseDouble(coord_kv.get("y"));
-
-		return d;
 	}
 
 	private List<Service> getServiceList(List<Stop> stops, int wEIGHT_INDEX2) {
