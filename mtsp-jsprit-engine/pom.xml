@@ -86,31 +86,7 @@
 			<version>1.4.2</version>
 		</dependency>
 
-		<!-- MATSim Dependencies -->
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>freight</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim</artifactId>
-			<version>0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.matsim</groupId>
-			<artifactId>matsim-lib</artifactId>
-			<version>0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>otfvis</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
+		
 	</dependencies>
 
 </project>
