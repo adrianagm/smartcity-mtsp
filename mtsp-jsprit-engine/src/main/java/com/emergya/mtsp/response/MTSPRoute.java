@@ -7,7 +7,10 @@ package com.emergya.mtsp.response;
 
 import com.emergya.mtsp.model.Stop;
 import com.emergya.mtsp.model.Vehicle;
+import com.emergya.mtsp.model.Way;
 import com.graphhopper.GHResponse;
+import com.graphhopper.util.Instruction;
+import com.graphhopper.util.InstructionList;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +26,9 @@ public class MTSPRoute implements Serializable {
 
     private final Vehicle vehicle;
     private final List<Stop> stops;
-
+    private List <Instruction> instructions; 
     private LineString geometry;
+    private List <Way> ways;
 
     public MTSPRoute(Vehicle vehicle) {
         this.vehicle = vehicle;
@@ -53,23 +57,43 @@ public class MTSPRoute implements Serializable {
     public List<Stop> getStops() {
         return stops;
     }
-    
-    
 
+    /**
+     * @return the instructions
+     */
+    public List <Instruction> getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(List <Instruction> instructions) {
+        this.instructions = instructions;
+    }
+    
     public LineString getGeometry() {
-		return geometry;
-	}
+        return geometry;
+    }
 
-	public void setGeometry(LineString geometry) {
-		this.geometry = geometry;
-	}
+    public void setGeometry(LineString geometry) {
+        this.geometry = geometry;
+    }
+    
+     /**
+     * @return the ways
+     */
+    public List <Way> getWays() {
+        return ways;
+    }
 
-	void createGeometry(GHResponse[][] distances) {
-        addGeometry(distances.length-1, stops.get(0).getIndex(), distances);
+    public void setWays(List <Way> ways) {
+        this.ways = ways;
+    }
+
+    void createGeometry(GHResponse[][] distances) {
+        addGeometry(distances.length - 1, stops.get(0).getIndex(), distances);
         for (int i = 1; i < stops.size(); i++) {
-            addGeometry(stops.get(i-1).getIndex(), stops.get(i).getIndex(), distances);
+            addGeometry(stops.get(i - 1).getIndex(), stops.get(i).getIndex(), distances);
         }
-        addGeometry(stops.get(stops.size()-1).getIndex(), distances.length-1, distances);
+        addGeometry(stops.get(stops.size() - 1).getIndex(), distances.length - 1, distances);
     }
 
     private void addGeometry(int idx1, int idx2, GHResponse[][] distances) {

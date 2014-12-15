@@ -7,6 +7,7 @@ import java.io.Serializable;
  * @author lroman
  */
 public class Stop  implements Serializable {
+    private String id;
     private String name;
     private double latitude;
     private double longitude;   
@@ -19,13 +20,19 @@ public class Stop  implements Serializable {
     
     
 
-    public Stop(String name, double latitude, double longitude) {
+    public Stop(String id, String name, double latitude, double longitude) {
+        this.id = id;
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
     
-    
+     /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
 
     /**
      * @return the name

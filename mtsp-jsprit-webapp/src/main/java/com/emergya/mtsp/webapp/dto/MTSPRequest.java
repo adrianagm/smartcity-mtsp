@@ -1,6 +1,7 @@
 package com.emergya.mtsp.webapp.dto;
 
 import com.emergya.mtsp.model.Stop;
+import com.emergya.mtsp.model.Vehicle;
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public class MTSPRequest implements Serializable {
 
-    private List<Stop> origins;
+    private List<Vehicle> vehicles;
     
     private List<Stop> stops;
 
@@ -29,16 +30,16 @@ public class MTSPRequest implements Serializable {
     }
 
     /**
-     * @return the origin
+     * @return the vehicles
      */
-    public List<Stop> getOrigins() {
-        return origins;
+    public List<Vehicle> getVehicles() {
+        return vehicles;
     }
 
     /**
-     * @param origin the origin to set
+     * @param vehicles the vehicles to set
      */
-    public void setOrigins(List<Stop> origins) {
-        this.origins = origins;
+    public void setVehicles(List<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 }
