@@ -1,11 +1,10 @@
 package com.emergya.mtsp.jsprit;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
 
 import javax.annotation.PostConstruct;
 
@@ -23,8 +22,6 @@ import jsprit.core.problem.solution.route.activity.TourActivity;
 import jsprit.core.problem.vehicle.VehicleImpl;
 import jsprit.core.problem.vehicle.VehicleType;
 import jsprit.core.problem.vehicle.VehicleTypeImpl;
-import jsprit.core.reporting.SolutionPrinter;
-import jsprit.core.reporting.SolutionPrinter.Print;
 import jsprit.core.util.Coordinate;
 import jsprit.core.util.Solutions;
 
@@ -43,13 +40,9 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.util.Instruction;
-import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
-import jsprit.core.problem.cost.TransportTime;
-import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
-import jsprit.core.problem.driver.Driver;
+
 
 /**
  *
@@ -126,7 +119,7 @@ public class MTSPJspritHandler {
             TourActivities activities = r.getTourActivities();
 
             Iterator<TourActivity> it = activities.iterator();
-            List<GHPoint> points = new LinkedList<GHPoint>();
+            List<GHPoint> points = new LinkedList<>();
             // Start point
             GHPoint startPoint = MTSPUtil.getCoordinatesFromString(r.getStart().getLocationId());
             points.add(startPoint);
@@ -134,7 +127,7 @@ public class MTSPJspritHandler {
             endPoint = MTSPUtil.getCoordinatesFromString(r.getEnd().getLocationId());
             //points.add(endPoint);
             // Intermediate points
-            List<Way> ways = new LinkedList<Way>();
+            List<Way> ways = new LinkedList<>();
 
             int i = 0;
             while (it.hasNext() && i < r.getActivities().size() - 1) {
@@ -155,7 +148,7 @@ public class MTSPJspritHandler {
                 TourActivity.JobActivity job = (TourActivity.JobActivity) ta;
                 TourActivity.JobActivity jobNext = (TourActivity.JobActivity) taNext;
                 
-                if ((!originId.equals(job.getJob().getId())) && (i == 0)) {
+                if ((i == 0) && (!originId.equals(job.getJob().getId()))) {
                     Way wayIni = calculateWay(startPoint, point, originId, job.getJob().getId(), bestSolution.getCost());
                     ways.add(wayIni);
                 }
@@ -163,8 +156,8 @@ public class MTSPJspritHandler {
                 ways.add(wayTa);
                 
 
-                if ((!targetId.equals(jobNext.getJob().getId())) && (i == r.getActivities().size() - 2)) {
-                   Way wayFinal = calculateWay(pointNext, endPoint, jobNext.getJob().getId(), targetId, bestSolution.getCost());
+                if ((i == r.getActivities().size() - 1) && (!targetId.equals(job.getJob().getId()))) {
+                   Way wayFinal = calculateWay(point, endPoint, job.getJob().getId(), targetId, bestSolution.getCost());
                    ways.add(wayFinal);
                 }
  
@@ -241,8 +234,9 @@ public class MTSPJspritHandler {
         return services;
     }
 
+    @SuppressWarnings("empty-statement")
     private List<VehicleImpl> getVehicleList(List<Vehicle> vehicles) {
-        List<VehicleImpl> vehicles_list = new LinkedList<VehicleImpl>();
+        List<VehicleImpl> vehicles_list = new LinkedList<>();
 
         int i = 0;
         for (Vehicle s : vehicles) {
